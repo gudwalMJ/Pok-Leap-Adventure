@@ -12,7 +12,6 @@ class Player {
     this.element = document.createElement("img");
     this.element.src = "../images/totodile.png";
     this.element.style.position = "absolute";
-
     this.element.style.height = `${this.height}px`;
     this.element.style.width = `${this.width}px`;
     this.element.style.left = `${this.left}px`;
@@ -20,16 +19,15 @@ class Player {
 
     this.gameScreen.appendChild(this.element);
 
-    // Bind the event handler methods in the constructor
+    // Bind event handlers
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
-    this.move = this.move.bind(this);
 
-    // Add event listeners using the bound methods
+    // Add event listeners
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("keyup", this.handleKeyUp);
 
-    // Call the animate method to start the animation loop
+    // Start the animation loop
     this.animate();
   }
 
@@ -64,8 +62,8 @@ class Player {
   }
 
   move() {
-    const newLeft = this.left + this.directionX * 4;
-    const newTop = this.top + this.directionY * 4;
+    const newLeft = this.left + this.directionX * 1.5;
+    const newTop = this.top + this.directionY * 1.5;
 
     // Define the bounds of the game screen
     const minX = 0;
@@ -80,6 +78,11 @@ class Player {
     // Update the player's position on the screen
     this.element.style.left = `${this.left}px`;
     this.element.style.top = `${this.top}px`;
+  }
+
+  resetPosition() {
+    this.left = 460;
+    this.top = 740;
     this.element.style.left = `${this.left}px`;
     this.element.style.top = `${this.top}px`;
   }
@@ -90,7 +93,6 @@ class Player {
     this.prevTime = currentTime;
 
     this.move();
-    console.log("Frame rate:", 1 / deltaTime); // Log frame rate
     requestAnimationFrame(() => this.animate());
   }
 }

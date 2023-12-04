@@ -1,35 +1,37 @@
-class obstacleFalinks {
-  constructor(gameScreen) {
+class ObstacleFalinks {
+  constructor(gameScreen, bottomMargin) {
     this.gameScreen = gameScreen;
-    this.width = 30;
-    this.height = 30;
-    this.speed = 2;
+    this.width = 80;
+    this.height = 80;
+    this.speed = 1;
 
     this.element = document.createElement("img");
     this.element.src = "../images/falinks.png";
     this.element.classList.add("obstacle");
+    this.element.style.position = "absolute";
     this.element.style.width = `${this.width}px`;
     this.element.style.height = `${this.height}px`;
 
-    this.spawn();
+    this.spawn(bottomMargin);
     this.gameScreen.appendChild(this.element);
   }
 
-  spawn() {
-    // Set initial position off-screen
-    this.element.style.left = `${this.gameScreen.offsetWidth}px`;
-    this.element.style.top = `${
-      Math.random() * (this.gameScreen.offsetHeight - this.height)
-    }px`;
+  spawn(bottomMargin) {
+    const initialLeft = -this.width;
+    const initialTop =
+      this.gameScreen.offsetHeight -
+      bottomMargin * this.gameScreen.offsetHeight -
+      this.height;
+
+    this.element.style.left = `${initialLeft}px`;
+    this.element.style.top = `${initialTop}px`;
   }
 
   move() {
-    // Update obstacle position
     const currentLeft = parseFloat(this.element.style.left);
-    this.element.style.left = `${currentLeft - this.speed}px`;
+    this.element.style.left = `${currentLeft + this.speed}px`;
 
-    // Check if obstacle is out of bounds, respawn if necessary
-    if (currentLeft + this.width < 0) {
+    if (currentLeft > this.gameScreen.offsetWidth) {
       this.spawn();
     }
   }
