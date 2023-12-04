@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css " />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Hedvig+Letters+Sans&display=swap"
+    />
     <style>
-      @import url("https://fonts.google.com/specimen/Hedvig+Letters+Sans");
+      @import url("https://fonts.googleapis.com/css2?family=Hedvig+Letters+Sans&display=swap");
     </style>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,33 +15,37 @@
     <link rel="stylesheet" href="styles.css/style.css" />
     <title>PokeLeap Adventure</title>
   </head>
-  <body class="background-container">
+
+  <body>
     <main>
-      <div id game intro>
+      <div id="game-intro">
         <img src="./images/poke_logo.png" alt="" class="logo-img" />
         <p>Use the arrows on your keyboard to control Totodile!</p>
         <p>
           Try to get him to the other side of the river, without losing lives.
         </p>
         <img src="./images/arrows.png" alt="" class="arrows-img" />
-        <button>Start Game</button>
+        <button id="startButton">Start Game</button>
       </div>
-      <div>
-        <h1>Stats</h1>
-        <p>Lives:</p>
-        <p>Score:</p>
+      <div id="game-container">
+        <div>
+          <h1>Stats</h1>
+          <p>Lives:</p>
+          <p>Score:</p>
+        </div>
+        <div id="game-screen"></div>
       </div>
-      <div id game screen>
+      <div id="game-end">
         <img of the game />
         <h1>Game Over</h1>
         <br />
         <button>restart</button>
       </div>
-
-      <script></script>
-      <script></script>
-      <script></script>
-      <script></script>
     </main>
+
+    <script type="text/javascript" src="js/obstacle.js"></script>
+    <script type="text/javascript" src="js/player.js"></script>
+    <script type="text/javascript" src="js/game.js"></script>
+    <script type="text/javascript" src="js/script.js"></script>
   </body>
 </html>

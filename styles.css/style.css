@@ -126,16 +126,16 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+html {
+  overflow: hidden;
+  height: 100%;
+}
 
 body {
   margin: 0;
   padding: 0;
+  background-image: url(/images/background.jpg);
   font-family: "Hedvig Letters Sans", sans-serif;
-  text-align: center;
-  box-sizing: border-box;
-}
-body.background-container {
-  background: url("../images/background.jpg") no-repeat;
   background-size: cover;
   background-position: center;
   height: 100vh;
@@ -145,7 +145,35 @@ body.background-container {
   justify-content: center;
   text-align: center;
   margin-top: 30px;
+  text-align: center;
+  box-sizing: border-box;
+  overflow: auto;
 }
+
+#game-intro {
+  padding: 20px 0px;
+}
+
+#game-container {
+  display: flex;
+  width: 100vw;
+  padding: 20px 0px;
+  justify-content: center;
+}
+#game-screen {
+  display: none;
+  align-content: center;
+  padding: 20px 0px;
+  overflow: hidden;
+  position: relative;
+  background-image: url(../images/game_map.png);
+  background-size: cover;
+  animation: slide 5s linear infinite;
+}
+#game-end {
+  display: none;
+}
+
 body button {
   font-size: 25px;
   background-color: #3c5aa6;
@@ -177,7 +205,7 @@ h1 {
 
 .logo-img {
   width: 400px;
-  margin-top: 10px;
+  margin-top: 50px;
   margin-bottom: 10px;
   display: block;
   margin-left: auto;
