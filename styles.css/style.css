@@ -134,7 +134,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background-image: url(/images/background.jpg);
+  background-image: url(images/background.jpg);
   font-family: "Hedvig Letters Sans", sans-serif;
   background-size: cover;
   background-position: center;
@@ -171,7 +171,7 @@ body {
   padding: 20px 0px;
   overflow: hidden;
   position: relative;
-  background-image: url(../images/game_map.png);
+  background-image: url(images/game_map.png);
   background-size: cover;
   transform: translateZ(0);
 }
