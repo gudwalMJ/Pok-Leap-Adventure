@@ -9,7 +9,7 @@ class Player {
     this.directionX = 0;
     this.directionY = 0;
     this.prevTime = performance.now();
-    this.onLapras = false;
+    this.resetCounter = 0;
 
     this.element = document.createElement("img");
     this.element.src = "../images/totodile.png";
@@ -117,9 +117,19 @@ class Player {
   resetPosition() {
     this.left = 460;
     this.top = 740;
-    this.onLapras = false;
     this.element.style.left = `${this.left}px`;
     this.element.style.top = `${this.top}px`;
+    this.resetCounter++;
+    this.updateSprite();
+  }
+
+  updateSprite() {
+    if (this.resetCounter >= 5) {
+      this.element.src = "../images/croconaw.png";
+      this.element.style.width = "70px";
+      this.element.style.height = "60px";
+      this.resetCounter = 0;
+    }
   }
 
   animate() {

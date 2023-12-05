@@ -7,6 +7,9 @@ class Game {
     this.width = 900;
     this.player = null;
     this.obstacles = [];
+    this.laprases = [];
+    this.lotads = [];
+    this.feraligatr = [];
     this.animateId = null;
     this.score = 0;
     this.lives = 3;
@@ -27,6 +30,8 @@ class Game {
     this.createPlayer();
     this.createObstacles(7);
     this.createLapras();
+    this.createLotadObstacles(7);
+    this.createFeraligatr(1);
     this.livesCounter.textContent = `Lives: ${this.lives}`;
     this.gameLoop();
   }
@@ -44,6 +49,16 @@ class Game {
 
   createPlayer() {
     this.player = new Player(this.gameScreen, this);
+  }
+
+  createFeraligatr(numFeraligatr) {
+    this.feraligatr = [];
+
+    for (let i = 0; i < numFeraligatr; i++) {
+      const bottomMargin = 150;
+      const feraligatr = new Feraligatr(this.gameScreen, this, bottomMargin);
+      this.feraligatr.push(feraligatr);
+    }
   }
 
   createLapras() {
@@ -80,6 +95,19 @@ class Game {
       [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
+  }
+
+  createLotadObstacles(numObstacles) {
+    this.lotads = [];
+
+    for (let i = 0; i < numObstacles; i++) {
+      setTimeout(() => this.createLotadObstacle(i), i * this.obstacleDelay);
+    }
+  }
+
+  createLotadObstacle(index) {
+    const lotad = new ObstacleLotad(this.gameScreen);
+    this.lotads.push(lotad);
   }
 
   createObstacles(numObstacles) {
@@ -123,20 +151,33 @@ class Game {
   moveObstacles() {
     this.obstacles.forEach((obstacle) => obstacle.move());
     this.laprases.forEach((lapras) => lapras.move());
+    this.lotads.forEach((lotad) => lotad.move());
   }
 
   checkCollisions() {
     this.checkCollisionGroup(this.obstacles);
     this.checkCollisionGroup(this.laprases);
+    this.checkCollisionGroup(this.lotads);
+    this.checkCollisionGroup(this.feraligatr);
   }
 
   checkCollisionGroup(group) {
     group.forEach((item) => {
       const playerRect = this.getPlayerHitbox();
-      const itemRect = this.getObstacleHitbox(item);
+      let itemRect;
+
+      if (item instanceof Feraligatr) {
+        itemRect = this.getFeraligatrHitbox(item);
+      } else {
+        itemRect = this.getObstacleHitbox(item);
+      }
 
       if (this.isCollision(playerRect, itemRect)) {
-        this.handleCollision();
+        if (item instanceof Feraligatr) {
+          this.handleFeraligatrCollision(item);
+        } else {
+          this.handleCollision();
+        }
       }
     });
   }
@@ -150,6 +191,24 @@ class Game {
     );
   }
 
+  handleFeraligatrCollision(feraligatr) {
+    // Increase the score
+    this.score += 100; // You can adjust the score increment as needed
+
+    // Update the score display
+    this.updateScoreDisplay();
+
+    this.playerReset();
+  }
+
+  updateScoreDisplay() {
+    // Update the score display element (assuming you have an element with id 'score-counter')
+    const scoreCounter = document.getElementById("score-counter");
+    if (scoreCounter) {
+      scoreCounter.textContent = `Score: ${this.score}`;
+    }
+  }
+
   getPlayerHitbox() {
     const playerRect = this.player.element.getBoundingClientRect();
     return this.adjustHitbox(playerRect);
@@ -161,8 +220,13 @@ class Game {
   }
 
   getLaprasHitbox() {
-    const laprasRect = this.lapras.element.getBoundingClientRect();
+    const laprasRect = this.lapras[0].element.getBoundingClientRect();
     return this.adjustHitbox(laprasRect);
+  }
+
+  getFeraligatrHitbox(feraligatr) {
+    const feraligatrRect = feraligatr.element.getBoundingClientRect();
+    return this.adjustHitbox(feraligatrRect);
   }
 
   adjustHitbox(rect) {
@@ -202,7 +266,18 @@ class Game {
     this.isGameOver = true;
     this.gameScreen.style.display = "none";
     this.endScreen.style.display = "block";
-
+    this.isGameOver = true;
+    this.lives = 3; // Reset the number of lives
+    this.score = 0; // Reset the score
+    this.livesCounter.textContent = `Lives: ${this.lives}`;
+    this.updateScoreDisplay();
+    this.clearObstacles();
+    this.createObstacles(7);
+    this.createLapras();
+    this.createLotadObstacles(7);
+    this.createFeraligatr(1);
+    this.isGameOver = false;
+    this.gameLoop();
     // Reset game state
     this.resetGameState();
 

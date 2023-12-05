@@ -1,12 +1,12 @@
-class ObstacleLapras {
+class ObstacleLotad {
   constructor(gameScreen, bottomMargin) {
     this.gameScreen = gameScreen;
-    this.width = 80;
-    this.height = 80;
-    this.speed = 1.5;
+    this.width = 40;
+    this.height = 40;
+    this.speed = 0.7;
 
     this.element = document.createElement("img");
-    this.element.src = "../images/lapras.png";
+    this.element.src = "../images/lotad.png";
     this.element.classList.add("obstacle");
     this.element.style.position = "absolute";
     this.element.style.width = `${this.width}px`;
@@ -27,9 +27,9 @@ class ObstacleLapras {
     this.bottomMargin = bottomMargin;
   }
 
-  calculateInitialTop() {
-    const topLimit = 100; // Top limit in pixels
-    const bottomLimit = this.gameScreen.offsetHeight - 335; // Bottom limit in pixels
+  calculateInitialTop(bottomMargin) {
+    const topLimit = 200; // Top limit in pixels
+    const bottomLimit = this.gameScreen.offsetHeight - 350; // Bottom limit in pixels
 
     const availableHeight = bottomLimit - topLimit;
 
@@ -42,7 +42,7 @@ class ObstacleLapras {
     this.element.style.left = `${currentLeft + this.speed}px`;
 
     if (currentLeft > this.gameScreen.offsetWidth) {
-      this.spawn(this.bottomMargin); // Fix: Access bottomMargin as a property of the class instance
+      this.spawn(this.bottomMargin);
     }
   }
 }
