@@ -11,19 +11,22 @@ class Game {
     this.score = 0;
     this.lives = 3;
     this.livesCounter = document.getElementById("lives-counter");
-    this.livesCounter.textContent = `Lives: ${this.lives}`;
     this.isGameOver = false;
 
     // Constants
     this.obstacleMargins = [0.12, 0.24, 0.18];
-    this.obstacleDelay = 2000; // milliseconds
+    this.obstacleDelay = 1500; // milliseconds
+
+    // Bind methods to the instance
+    this.gameLoop = this.gameLoop.bind(this);
   }
 
   start() {
     this.hideScreens();
     this.setGameScreenSize();
     this.createPlayer();
-    this.createObstacles(3);
+    this.createObstacles(7);
+    this.createLapras();
     this.livesCounter.textContent = `Lives: ${this.lives}`;
     this.gameLoop();
   }
@@ -40,11 +43,47 @@ class Game {
   }
 
   createPlayer() {
-    this.player = new Player(this.gameScreen);
+    this.player = new Player(this.gameScreen, this);
+  }
+
+  createLapras() {
+    const bottomMargin = 0.35; // Set the value as needed
+    this.laprases = [];
+
+    for (let i = 0; i < 7; i++) {
+      setTimeout(
+        () => this.createLaprasObstacle(i, bottomMargin),
+        i * this.obstacleDelay
+      );
+    }
+  }
+
+  createLaprasObstacle(index, bottomMargin) {
+    const laprasObstacleMargins = [0.31, 0.39, 0.41];
+
+    // Shuffle the laprasObstacleMargins array randomly
+    const shuffledMargins = this.shuffleArray(laprasObstacleMargins);
+
+    // Use the shuffled margin for the current Lapras obstacle
+    const lapras = new ObstacleLapras(
+      this.gameScreen,
+      shuffledMargins[index % shuffledMargins.length], // Use modulo to cycle through shuffled margins
+      bottomMargin
+    );
+    this.laprases.push(lapras);
+  }
+
+  // Helper function to shuffle an array (Fisher-Yates algorithm)
+  shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 
   createObstacles(numObstacles) {
-    this.obstacles = []; // Reset obstacles array
+    this.obstacles = [];
 
     for (let i = 0; i < numObstacles; i++) {
       setTimeout(() => this.createObstacle(i), i * this.obstacleDelay);
@@ -52,31 +91,51 @@ class Game {
   }
 
   createObstacle(index) {
+    const shuffledMargins = this.shuffleArray(this.obstacleMargins);
+
+    // Use the shuffled margin for the current obstacle
     const obstacle = new ObstacleFalinks(
       this.gameScreen,
-      this.obstacleMargins[index]
+      shuffledMargins[index % shuffledMargins.length] // Use modulo to cycle through shuffled margins
     );
     this.obstacles.push(obstacle);
   }
 
-  gameLoop() {
-    this.player.move();
-    this.moveObstacles();
-    this.checkCollisions();
+  // Helper function to shuffle an array (Fisher-Yates algorithm)
+  shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
 
-    this.animateId = requestAnimationFrame(() => this.gameLoop());
+  gameLoop() {
+    if (!this.isGameOver) {
+      this.player.move();
+      this.moveObstacles();
+      this.checkCollisions();
+
+      this.animateId = requestAnimationFrame(this.gameLoop);
+    }
   }
 
   moveObstacles() {
     this.obstacles.forEach((obstacle) => obstacle.move());
+    this.laprases.forEach((lapras) => lapras.move());
   }
 
   checkCollisions() {
-    this.obstacles.forEach((obstacle) => {
-      const playerRect = this.getPlayerHitbox();
-      const obstacleRect = this.getObstacleHitbox(obstacle);
+    this.checkCollisionGroup(this.obstacles);
+    this.checkCollisionGroup(this.laprases);
+  }
 
-      if (this.isCollision(playerRect, obstacleRect)) {
+  checkCollisionGroup(group) {
+    group.forEach((item) => {
+      const playerRect = this.getPlayerHitbox();
+      const itemRect = this.getObstacleHitbox(item);
+
+      if (this.isCollision(playerRect, itemRect)) {
         this.handleCollision();
       }
     });
@@ -99,6 +158,11 @@ class Game {
   getObstacleHitbox(obstacle) {
     const obstacleRect = obstacle.element.getBoundingClientRect();
     return this.adjustHitbox(obstacleRect);
+  }
+
+  getLaprasHitbox() {
+    const laprasRect = this.lapras.element.getBoundingClientRect();
+    return this.adjustHitbox(laprasRect);
   }
 
   adjustHitbox(rect) {

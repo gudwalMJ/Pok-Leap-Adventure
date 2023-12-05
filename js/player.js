@@ -1,6 +1,7 @@
 class Player {
-  constructor(gameScreen) {
+  constructor(gameScreen, game) {
     this.gameScreen = gameScreen;
+    this.game = game;
     this.left = 460;
     this.top = 740;
     this.height = 50;
@@ -8,9 +9,10 @@ class Player {
     this.directionX = 0;
     this.directionY = 0;
     this.prevTime = performance.now();
+    this.onLapras = false;
 
     this.element = document.createElement("img");
-    this.element.src = "/images/totodile.png";
+    this.element.src = "../images/totodile.png";
     this.element.style.position = "absolute";
     this.element.style.height = `${this.height}px`;
     this.element.style.width = `${this.width}px`;
@@ -31,6 +33,29 @@ class Player {
     this.animate();
   }
 
+  getPlayerHitbox() {
+    const playerRect = this.element.getBoundingClientRect();
+    return this.adjustHitbox(playerRect);
+  }
+
+  adjustHitbox(rect) {
+    return {
+      left: rect.left + 7,
+      right: rect.right - 7,
+      top: rect.top + 13,
+      bottom: rect.bottom - 13,
+    };
+  }
+
+  isCollision(rect1, rect2) {
+    return (
+      rect1.left < rect2.right &&
+      rect1.right > rect2.left &&
+      rect1.top < rect2.bottom &&
+      rect1.bottom > rect2.top
+    );
+  }
+
   handleKeyDown(event) {
     switch (event.key) {
       case "ArrowUp":
@@ -40,10 +65,14 @@ class Player {
         this.directionY = 1;
         break;
       case "ArrowLeft":
-        this.directionX = -1;
+        if (!this.onLapras) {
+          this.directionX = -1;
+        }
         break;
       case "ArrowRight":
-        this.directionX = 1;
+        if (!this.onLapras) {
+          this.directionX = 1;
+        }
         break;
     }
   }
@@ -80,9 +109,15 @@ class Player {
     this.element.style.top = `${this.top}px`;
   }
 
+  checkLaprasCollision(laprasRect) {
+    const playerRect = this.getPlayerHitbox();
+    this.onLapras = this.isCollision(playerRect, laprasRect);
+  }
+
   resetPosition() {
     this.left = 460;
     this.top = 740;
+    this.onLapras = false;
     this.element.style.left = `${this.left}px`;
     this.element.style.top = `${this.top}px`;
   }
@@ -92,7 +127,9 @@ class Player {
     const deltaTime = (currentTime - this.prevTime) / 1000; // Convert to seconds
     this.prevTime = currentTime;
 
-    this.move();
-    requestAnimationFrame(() => this.animate());
+    if (!this.game.isGameOver) {
+      this.move();
+      requestAnimationFrame(() => this.animate());
+    }
   }
 }

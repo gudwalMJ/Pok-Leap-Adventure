@@ -1,12 +1,12 @@
-class ObstacleFalinks {
-  constructor(gameScreen, bottomMargin, speed = 1) {
+class ObstacleLapras {
+  constructor(gameScreen, bottomMargin, river) {
     this.gameScreen = gameScreen;
     this.width = 80;
     this.height = 80;
-    this.speed = speed;
-
+    this.speed = 1.5;
+    this.river = river;
     this.element = document.createElement("img");
-    this.element.src = "../images/falinks.png";
+    this.element.src = "../images/lapras.png";
     this.element.classList.add("obstacle");
     this.element.style.position = "absolute";
     this.element.style.width = `${this.width}px`;
@@ -18,13 +18,23 @@ class ObstacleFalinks {
 
   spawn(bottomMargin) {
     const initialLeft = -this.width;
-    const initialTop =
-      this.gameScreen.offsetHeight -
-      bottomMargin * this.gameScreen.offsetHeight -
-      this.height;
+    const initialTop = this.calculateInitialTop(bottomMargin);
 
     this.element.style.left = `${initialLeft}px`;
     this.element.style.top = `${initialTop}px`;
+
+    // Store bottomMargin as a property of the class instance
+    this.bottomMargin = bottomMargin;
+  }
+
+  calculateInitialTop() {
+    const topLimit = 100; // Top limit in pixels
+    const bottomLimit = this.gameScreen.offsetHeight - 335; // Bottom limit in pixels
+
+    const availableHeight = bottomLimit - topLimit;
+
+    const randomTop = Math.random() * availableHeight;
+    return topLimit + randomTop;
   }
 
   move() {
@@ -32,7 +42,7 @@ class ObstacleFalinks {
     this.element.style.left = `${currentLeft + this.speed}px`;
 
     if (currentLeft > this.gameScreen.offsetWidth) {
-      this.spawn();
+      this.spawn(this.bottomMargin); // Fix: Access bottomMargin as a property of the class instance
     }
   }
 }
