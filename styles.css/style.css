@@ -134,7 +134,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background-image: url(./images/background.jpg);
+  background-image: url("./images/background.jpg");
   font-family: "Hedvig Letters Sans", sans-serif;
   background-size: cover;
   background-position: center;
