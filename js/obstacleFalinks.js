@@ -1,9 +1,9 @@
 class ObstacleFalinks {
-  constructor(gameScreen, bottomMargin, speed = 1) {
+  constructor(gameScreen, bottomMargin) {
     this.gameScreen = gameScreen;
-    this.width = 80;
-    this.height = 80;
-    this.speed = speed;
+    this.width = 70;
+    this.height = 70;
+    this.speed = 1;
 
     this.element = document.createElement("img");
     this.element.src = "images/falinks.png";

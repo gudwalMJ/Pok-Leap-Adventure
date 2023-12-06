@@ -2,8 +2,9 @@ class Player {
   constructor(gameScreen, game) {
     this.gameScreen = gameScreen;
     this.game = game;
-    this.left = 460;
-    this.top = 740;
+    this.MOVE_SPEED = 1.5;
+    this.START_LEFT = 460;
+    this.START_TOP = 740;
     this.height = 50;
     this.width = 40;
     this.directionX = 0;
@@ -12,7 +13,7 @@ class Player {
     this.resetCounter = 0;
 
     this.element = document.createElement("img");
-    this.element.src = "../images/totodile.png";
+    this.element.src = "images/totodile.png";
     this.element.style.position = "absolute";
     this.element.style.height = `${this.height}px`;
     this.element.style.width = `${this.width}px`;
@@ -29,6 +30,7 @@ class Player {
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("keyup", this.handleKeyUp);
 
+    this.resetPosition();
     // Start the animation loop
     this.animate();
   }
@@ -65,14 +67,10 @@ class Player {
         this.directionY = 1;
         break;
       case "ArrowLeft":
-        if (!this.onLapras) {
-          this.directionX = -1;
-        }
+        this.directionX = -1;
         break;
       case "ArrowRight":
-        if (!this.onLapras) {
-          this.directionX = 1;
-        }
+        this.directionX = 1;
         break;
     }
   }
@@ -91,8 +89,8 @@ class Player {
   }
 
   move() {
-    const newLeft = this.left + this.directionX * 1.5;
-    const newTop = this.top + this.directionY * 1.5;
+    const newLeft = this.left + this.directionX * this.MOVE_SPEED;
+    const newTop = this.top + this.directionY * this.MOVE_SPEED;
 
     // Define the bounds of the game screen
     const minX = 0;
@@ -109,14 +107,9 @@ class Player {
     this.element.style.top = `${this.top}px`;
   }
 
-  checkLaprasCollision(laprasRect) {
-    const playerRect = this.getPlayerHitbox();
-    this.onLapras = this.isCollision(playerRect, laprasRect);
-  }
-
   resetPosition() {
-    this.left = 460;
-    this.top = 740;
+    this.left = this.START_LEFT;
+    this.top = this.START_TOP;
     this.element.style.left = `${this.left}px`;
     this.element.style.top = `${this.top}px`;
     this.resetCounter++;
@@ -126,17 +119,13 @@ class Player {
   updateSprite() {
     if (this.resetCounter >= 5) {
       this.element.src = "images/croconaw.png";
-      this.element.style.width = "60px";
-      this.element.style.height = "50px";
+      this.element.style.width = "50px";
+      this.element.style.height = "40px";
       this.resetCounter = 0;
     }
   }
 
   animate() {
-    const currentTime = performance.now();
-    const deltaTime = (currentTime - this.prevTime) / 1000; // Convert to seconds
-    this.prevTime = currentTime;
-
     if (!this.game.isGameOver) {
       this.move();
       requestAnimationFrame(() => this.animate());

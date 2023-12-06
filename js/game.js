@@ -105,7 +105,7 @@ class Game {
     }
   }
 
-  createLotadObstacle(index) {
+  createLotadObstacle() {
     const lotad = new ObstacleLotad(this.gameScreen);
     this.lotads.push(lotad);
   }
@@ -191,7 +191,7 @@ class Game {
     );
   }
 
-  handleFeraligatrCollision(feraligatr) {
+  handleFeraligatrCollision() {
     // Increase the score
     this.score += 100; // You can adjust the score increment as needed
 

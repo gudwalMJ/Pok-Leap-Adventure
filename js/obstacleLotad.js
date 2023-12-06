@@ -3,7 +3,7 @@ class ObstacleLotad {
     this.gameScreen = gameScreen;
     this.width = 40;
     this.height = 40;
-    this.speed = 0.7;
+    this.speed = 0.8;
 
     this.element = document.createElement("img");
     this.element.src = "images/lotad.png";
@@ -27,7 +27,7 @@ class ObstacleLotad {
     this.bottomMargin = bottomMargin;
   }
 
-  calculateInitialTop(bottomMargin) {
+  calculateInitialTop() {
     const topLimit = 200; // Top limit in pixels
     const bottomLimit = this.gameScreen.offsetHeight - 350; // Bottom limit in pixels
 
