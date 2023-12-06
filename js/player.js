@@ -13,7 +13,7 @@ class Player {
     this.resetCounter = 0;
 
     this.element = document.createElement("img");
-    this.element.src = "images/totodile.png";
+    this.element.src = "./images/totodile.png";
     this.element.style.position = "absolute";
     this.element.style.height = `${this.height}px`;
     this.element.style.width = `${this.width}px`;
