@@ -3,7 +3,7 @@ class Berry {
     this.gameScreen = gameScreen;
     this.game = game;
     this.element = document.createElement("img");
-    this.element.src = "../images/berry.png";
+    this.element.src = "images/berry.png";
     this.element.className = "berry";
     this.size = 50; // Adjust the size as needed
     this.element.style.width = `${this.size}px`;
