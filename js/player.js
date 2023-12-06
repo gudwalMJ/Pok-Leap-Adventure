@@ -12,7 +12,7 @@ class Player {
     this.resetCounter = 0;
 
     this.element = document.createElement("img");
-    this.element.src = "../images/totodile.png";
+    this.element.src = "images/totodile.png";
     this.element.style.position = "absolute";
     this.element.style.height = `${this.height}px`;
     this.element.style.width = `${this.width}px`;
@@ -125,7 +125,7 @@ class Player {
 
   updateSprite() {
     if (this.resetCounter >= 5) {
-      this.element.src = "../images/croconaw.png";
+      this.element.src = "images/croconaw.png";
       this.element.style.width = "70px";
       this.element.style.height = "60px";
       this.resetCounter = 0;

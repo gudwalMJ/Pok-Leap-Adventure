@@ -10,7 +10,7 @@ class Feraligatr {
     this.top = 0;
 
     this.element = document.createElement("img");
-    this.element.src = "../images/feraligatr.png";
+    this.element.src = "images/feraligatr.png";
     this.element.style.position = "absolute";
     this.element.style.width = `${this.width}px`;
     this.element.style.height = `${this.height}px`;

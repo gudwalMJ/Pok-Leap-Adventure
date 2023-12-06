@@ -6,7 +6,7 @@ class ObstacleLapras {
     this.speed = 1.5;
 
     this.element = document.createElement("img");
-    this.element.src = "../images/lapras.png";
+    this.element.src = "images/lapras.png";
     this.element.classList.add("obstacle");
     this.element.style.position = "absolute";
     this.element.style.width = `${this.width}px`;

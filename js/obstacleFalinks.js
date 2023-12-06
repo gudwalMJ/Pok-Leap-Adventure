@@ -6,7 +6,7 @@ class ObstacleFalinks {
     this.speed = speed;
 
     this.element = document.createElement("img");
-    this.element.src = "../images/falinks.png";
+    this.element.src = "images/falinks.png";
     this.element.classList.add("obstacle");
     this.element.style.position = "absolute";
     this.element.style.width = `${this.width}px`;
