@@ -57,9 +57,17 @@ class Game {
   }
 
   createBerry() {
-    if (this.score > 0 && this.score % 300 === 0 && !this.berry) {
+    const berryCreationThreshold = 500;
+
+    // Check if the score has exceeded the last berry creation score by the threshold
+    if (this.score > this.lastBerryCreationScore + berryCreationThreshold) {
       console.log("Creating Berry. Score:", this.score);
+
+      // Create a new berry
       this.berry = new Berry(this.gameScreen, this);
+
+      // Update the last berry creation score
+      this.lastBerryCreationScore = this.score;
     }
   }
 
