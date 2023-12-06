@@ -183,7 +183,7 @@ body {
 }
 
 body button {
-  font-size: 25px;
+  font-size: 35px;
   background-color: #3c5aa6;
   color: #ffcb05;
   padding: 15px 25px;
@@ -213,7 +213,7 @@ h1 {
 }
 
 .logo-img {
-  width: 400px;
+  width: 500px;
   margin-top: 50px;
   margin-bottom: 10px;
   display: block;
@@ -221,7 +221,7 @@ h1 {
   margin-right: auto;
 }
 .arrows-img {
-  width: 150px;
+  width: 250px;
   margin-top: 20px;
   margin-bottom: 10px;
   display: block; /* Change from flex to block */

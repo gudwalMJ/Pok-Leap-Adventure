@@ -10,6 +10,9 @@ class Game {
     this.laprases = [];
     this.lotads = [];
     this.feraligatr = [];
+    this.easterEggs = [];
+    this.berry = null;
+    this.lastBerryCreationScore = 0;
     this.animateId = null;
     this.score = 0;
     this.lives = 3;
@@ -32,6 +35,8 @@ class Game {
     this.createLapras();
     this.createLotadObstacles(7);
     this.createFeraligatr(1);
+    this.createEasterEgg(1);
+    this.createBerry();
     this.livesCounter.textContent = `Lives: ${this.lives}`;
     this.gameLoop();
   }
@@ -49,6 +54,31 @@ class Game {
 
   createPlayer() {
     this.player = new Player(this.gameScreen, this);
+  }
+
+  createBerry() {
+    if (this.score > 0 && this.score % 300 === 0 && !this.berry) {
+      console.log("Creating Berry. Score:", this.score);
+      this.berry = new Berry(this.gameScreen, this);
+    }
+  }
+
+  createEasterEgg() {
+    // Check if the score is greater than or equal to 1000 to spawn Easter Egg
+    if (this.score >= 1000 && !this.easterEggAppeared) {
+      const easterEgg = new EasterEgg(this.gameScreen);
+      easterEgg.spawn();
+      this.easterEggs.push(easterEgg);
+
+      // Set the flag to true so that the Easter Egg won't appear again
+      this.easterEggAppeared = true;
+    }
+  }
+
+  createEasterEggObstacle() {
+    const easterEgg = new EasterEgg(this.gameScreen);
+    easterEgg.spawn();
+    this.easterEggs.push(easterEgg);
   }
 
   createFeraligatr(numFeraligatr) {
@@ -143,6 +173,9 @@ class Game {
       this.player.move();
       this.moveObstacles();
       this.checkCollisions();
+      this.updateScoreDisplay();
+      this.createEasterEgg(); // Check for Easter Egg creation
+      this.createBerry(); // Check for Berry creation
 
       this.animateId = requestAnimationFrame(this.gameLoop);
     }
@@ -159,27 +192,39 @@ class Game {
     this.checkCollisionGroup(this.laprases);
     this.checkCollisionGroup(this.lotads);
     this.checkCollisionGroup(this.feraligatr);
+    this.checkCollisionGroup(this.easterEggs);
+    this.checkCollisionGroup([this.berry]);
   }
 
   checkCollisionGroup(group) {
-    group.forEach((item) => {
-      const playerRect = this.getPlayerHitbox();
-      let itemRect;
+    if (group && group.length > 0) {
+      group.forEach((item) => {
+        const playerRect = this.getPlayerHitbox();
+        let itemRect;
 
-      if (item instanceof Feraligatr) {
-        itemRect = this.getFeraligatrHitbox(item);
-      } else {
-        itemRect = this.getObstacleHitbox(item);
-      }
-
-      if (this.isCollision(playerRect, itemRect)) {
         if (item instanceof Feraligatr) {
-          this.handleFeraligatrCollision(item);
+          itemRect = this.getFeraligatrHitbox(item);
+        } else if (item instanceof EasterEgg) {
+          itemRect = this.getEasterEggHitbox(item);
+        } else if (item instanceof Berry) {
+          itemRect = this.getBerryHitbox(item);
         } else {
-          this.handleCollision();
+          itemRect = this.getObstacleHitbox(item);
         }
-      }
-    });
+
+        if (this.isCollision(playerRect, itemRect)) {
+          if (item instanceof Feraligatr) {
+            this.handleFeraligatrCollision(item);
+          } else if (item instanceof EasterEgg) {
+            this.handleEasterEggCollision(item);
+          } else if (item instanceof Berry) {
+            this.handleBerryCollision(item);
+          } else {
+            this.handleCollision();
+          }
+        }
+      });
+    }
   }
 
   isCollision(rect1, rect2) {
@@ -191,16 +236,6 @@ class Game {
     );
   }
 
-  handleFeraligatrCollision() {
-    // Increase the score
-    this.score += 100; // You can adjust the score increment as needed
-
-    // Update the score display
-    this.updateScoreDisplay();
-
-    this.playerReset();
-  }
-
   updateScoreDisplay() {
     // Update the score display element (assuming you have an element with id 'score-counter')
     const scoreCounter = document.getElementById("score-counter");
@@ -209,14 +244,49 @@ class Game {
     }
   }
 
+  handleFeraligatrCollision() {
+    // Increase the score
+    this.score += 150; // You can adjust the score increment as needed
+
+    // Update the score display
+    this.updateScoreDisplay();
+
+    this.playerReset();
+  }
+
+  handleEasterEggCollision(easterEgg) {
+    // Increase the score by 1000
+    this.score += 1500;
+
+    // Update the score display
+    this.updateScoreDisplay();
+
+    // Remove the Easter Egg from the game
+    const index = this.easterEggs.indexOf(easterEgg);
+    if (index !== -1) {
+      this.easterEggs.splice(index, 1);
+      easterEgg.element.remove();
+    }
+  }
+
+  handleBerryCollision(berry) {
+    // Handle collision logic for Berry
+    berry.handleCollision();
+  }
+
   getPlayerHitbox() {
     const playerRect = this.player.element.getBoundingClientRect();
     return this.adjustHitbox(playerRect);
   }
 
   getObstacleHitbox(obstacle) {
-    const obstacleRect = obstacle.element.getBoundingClientRect();
-    return this.adjustHitbox(obstacleRect);
+    if (obstacle) {
+      const obstacleRect = obstacle.element.getBoundingClientRect();
+      return this.adjustHitbox(obstacleRect);
+    } else {
+      // Handle the case where obstacle is null (or not defined)
+      return { left: 0, right: 0, top: 0, bottom: 0 };
+    }
   }
 
   getLaprasHitbox() {
@@ -227,6 +297,16 @@ class Game {
   getFeraligatrHitbox(feraligatr) {
     const feraligatrRect = feraligatr.element.getBoundingClientRect();
     return this.adjustHitbox(feraligatrRect);
+  }
+
+  getEasterEggHitbox(easterEgg) {
+    const easterEggRect = easterEgg.element.getBoundingClientRect();
+    return this.adjustHitbox(easterEggRect);
+  }
+
+  getBerryHitbox(berry) {
+    const berryRect = berry.element.getBoundingClientRect();
+    return this.adjustHitbox(berryRect);
   }
 
   adjustHitbox(rect) {
