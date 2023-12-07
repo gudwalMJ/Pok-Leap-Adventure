@@ -1,77 +1,77 @@
 class Game {
   constructor() {
+    // DOM elements
     this.startScreen = document.getElementById("game-intro");
     this.gameScreen = document.getElementById("game-screen");
     this.endScreen = document.getElementById("game-end");
     this.gameScreenAudio = document.getElementById("gameScreenAudio");
+    this.livesCounter = document.getElementById("lives-counter");
+    this.muteButton = document.getElementById("muteButton");
+
+    // Game properties
     this.height = 750;
     this.width = 900;
     this.player = null;
-    // Volume
-    this.gameScreenAudio.volume = 0.3;
-
-    // Obstacles
     this.obstacles = [];
     this.laprases = [];
     this.lotads = [];
     this.feraligatr = [];
-    // Items
     this.easterEggs = [];
     this.berry = null;
     this.lastBerryCreationScore = 0;
     this.animateId = null;
     this.score = 0;
     this.lives = 3;
-    this.livesCounter = document.getElementById("lives-counter");
     this.isGameOver = false;
-    // Mute button
-    this.muteButton = document.getElementById("muteButton");
 
-    // Constants
+    // Audio volume
+    this.gameScreenAudio.volume = 0.3;
+
+    // Obstacle constants
     this.obstacleMargins = [0.12, 0.24, 0.18];
     this.obstacleDelay = 1500; // milliseconds
 
     // Bind methods to the instance
     this.gameLoop = this.gameLoop.bind(this);
-    // mute button binded
     this.toggleGameScreenAudio = this.toggleGameScreenAudio.bind(this);
   }
+
   // Sound
   playGameScreenAudio() {
-    const gameScreenAudio = document.getElementById("gameScreenAudio");
-    if (gameScreenAudio.paused) {
-      gameScreenAudio.play();
+    if (this.gameScreenAudio.paused) {
+      this.gameScreenAudio.play();
     } else {
-      gameScreenAudio.pause();
+      this.gameScreenAudio.pause();
     }
   }
+
   toggleGameScreenAudio() {
     const gameScreenAudio = document.getElementById("gameScreenAudio");
+
     if (gameScreenAudio.paused) {
+      console.log("Audio is paused, playing now.");
       gameScreenAudio.play();
     } else {
+      console.log("Audio is playing, pausing now.");
       gameScreenAudio.pause();
     }
   }
 
+  // START
   start() {
     this.hideScreens();
     this.setGameScreenSize();
-    // Player
     this.createPlayer();
-
-    // Obstacles
     this.createObstacles(7);
     this.createLapras();
     this.createLotadObstacles(7);
     this.createFeraligatr(1);
-    // Items
     this.createEasterEgg(1);
     this.createBerry();
     this.livesCounter.textContent = `Lives: ${this.lives}`;
     this.gameLoop();
     this.muteButton.style.display = "block";
-    this.playGameScreenAudio(); // Start the game audio
+    this.playGameScreenAudio();
     this.muteButton.addEventListener("click", this.toggleGameScreenAudio);
   }
 
@@ -86,39 +86,32 @@ class Game {
     this.gameScreen.style.width = `${this.width}px`;
   }
 
+  // Creation
   createPlayer() {
     this.player = new Player(this.gameScreen, this);
   }
 
   createBerry() {
     const berryCreationThreshold = 500;
-
-    // Check if the score has exceeded the last berry creation score by the threshold
     if (this.score > this.lastBerryCreationScore + berryCreationThreshold) {
-      console.log("Creating Berry. Score:", this.score);
-
-      // Create a new berry
       this.berry = new Berry(this.gameScreen, this);
-
-      // Update the last berry creation score
       this.lastBerryCreationScore = this.score;
     }
   }
 
   createEasterEgg() {
-    // Check if the score is greater than or equal to 1000 to spawn Easter Egg
     if (this.score >= 1000 && !this.easterEggAppeared) {
-      // Play the Easter Egg sound
-      const easterEggSound = document.getElementById("easterEggSound");
-      easterEggSound.play();
-
+      this.playEasterEggSound();
       const easterEgg = new EasterEgg(this.gameScreen);
       easterEgg.spawn();
       this.easterEggs.push(easterEgg);
-
-      // Set the flag to true so that the Easter Egg won't appear again
       this.easterEggAppeared = true;
     }
+  }
+
+  playEasterEggSound() {
+    const easterEggSound = document.getElementById("easterEggSound");
+    easterEggSound.play();
   }
 
   createEasterEggObstacle() {
@@ -129,7 +122,6 @@ class Game {
 
   createFeraligatr(numFeraligatr) {
     this.feraligatr = [];
-
     for (let i = 0; i < numFeraligatr; i++) {
       const bottomMargin = 150;
       const feraligatr = new Feraligatr(this.gameScreen, this, bottomMargin);
@@ -138,9 +130,8 @@ class Game {
   }
 
   createLapras() {
-    const bottomMargin = 0.35; // Set the value as needed
+    const bottomMargin = 0.35;
     this.laprases = [];
-
     for (let i = 0; i < 7; i++) {
       setTimeout(
         () => this.createLaprasObstacle(i, bottomMargin),
@@ -151,14 +142,10 @@ class Game {
 
   createLaprasObstacle(index, bottomMargin) {
     const laprasObstacleMargins = [0.31, 0.39, 0.41];
-
-    // Shuffle the laprasObstacleMargins array randomly
     const shuffledMargins = this.shuffleArray(laprasObstacleMargins);
-
-    // Use the shuffled margin for the current Lapras obstacle
     const lapras = new ObstacleLapras(
       this.gameScreen,
-      shuffledMargins[index % shuffledMargins.length], // Use modulo to cycle through shuffled margins
+      shuffledMargins[index % shuffledMargins.length],
       bottomMargin
     );
     this.laprases.push(lapras);
@@ -176,7 +163,6 @@ class Game {
   // Create Lotad
   createLotadObstacles(numObstacles) {
     this.lotads = [];
-
     for (let i = 0; i < numObstacles; i++) {
       setTimeout(() => this.createLotadObstacle(i), i * this.obstacleDelay);
     }
@@ -186,10 +172,10 @@ class Game {
     const lotad = new ObstacleLotad(this.gameScreen);
     this.lotads.push(lotad);
   }
+
   // Create Falinks
   createObstacles(numObstacles) {
     this.obstacles = [];
-
     for (let i = 0; i < numObstacles; i++) {
       setTimeout(() => this.createObstacle(i), i * this.obstacleDelay);
     }
@@ -197,23 +183,13 @@ class Game {
 
   createObstacle(index) {
     const shuffledMargins = this.shuffleArray(this.obstacleMargins);
-
-    // Use the shuffled margin for the current obstacle
     const obstacle = new ObstacleFalinks(
       this.gameScreen,
-      shuffledMargins[index % shuffledMargins.length] // Use modulo to cycle through shuffled margins
+      shuffledMargins[index % shuffledMargins.length]
     );
     this.obstacles.push(obstacle);
   }
 
-  // Helper function to shuffle an array (Fisher-Yates algorithm)
-  shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  }
   // GameLoop
   gameLoop() {
     if (!this.isGameOver) {
@@ -221,9 +197,8 @@ class Game {
       this.moveObstacles();
       this.checkCollisions();
       this.updateScoreDisplay();
-      this.createEasterEgg(); // Check for Easter Egg creation
-      this.createBerry(); // Check for Berry creation
-
+      this.createEasterEgg();
+      this.createBerry();
       this.animateId = requestAnimationFrame(this.gameLoop);
     }
   }
@@ -236,12 +211,12 @@ class Game {
 
   // Score Display
   updateScoreDisplay() {
-    // Update the score display element (assuming you have an element with id 'score-counter')
     const scoreCounter = document.getElementById("score-counter");
     if (scoreCounter) {
       scoreCounter.textContent = `Score: ${this.score}`;
     }
   }
+
   // Collisions
   checkCollisions() {
     this.checkCollisionGroup(this.obstacles);
@@ -291,62 +266,61 @@ class Game {
       rect1.bottom > rect2.top
     );
   }
+
   // Feraligatr Collision
   handleFeraligatrCollision() {
-    // Play the Feraligatr collision sound
+    this.playFeraligatrCollisionSound();
+    this.score += 150;
+    this.updateScoreDisplay();
+    this.playerReset();
+    this.stopSoundAfterDelay("feraligatrCollisionSound", 2000);
+  }
+
+  playFeraligatrCollisionSound() {
     const feraligatrCollisionSound = document.getElementById(
       "feraligatrCollisionSound"
     );
     feraligatrCollisionSound.play();
-
-    // Increase the score
-    this.score += 150; // You can adjust the score increment as needed
-
-    // Update the score display
-    this.updateScoreDisplay();
-
-    // Reset the player's position
-    this.playerReset();
-
-    // Stop the Feraligatr collision sound after 2 seconds
-    setTimeout(() => {
-      feraligatrCollisionSound.pause();
-      feraligatrCollisionSound.currentTime = 0;
-    }, 2000);
   }
+
   // Easter Egg collision
   handleEasterEggCollision(easterEgg) {
-    // Stop the Easter Egg sound
+    this.stopEasterEggSound();
+    this.playFeraligatrCollisionSound();
+    this.score += 1500;
+    this.updateScoreDisplay();
+    this.removeEasterEgg(easterEgg);
+    this.stopSoundAfterDelay("feraligatrCollisionSound", 2000);
+  }
+
+  stopEasterEggSound() {
     const easterEggSound = document.getElementById("easterEggSound");
     easterEggSound.pause();
     easterEggSound.currentTime = 0;
+  }
 
-    // Increase the score by 1000
-    this.score += 1500;
-
-    // Update the score display
-    this.updateScoreDisplay();
-
-    // Remove the Easter Egg from the game
+  removeEasterEgg(easterEgg) {
     const index = this.easterEggs.indexOf(easterEgg);
     if (index !== -1) {
       this.easterEggs.splice(index, 1);
       easterEgg.element.remove();
     }
   }
+
   // Berry Collision
   handleBerryCollision(berry) {
-    // Play berry sound
-    const berrySound = document.getElementById("berrySound");
-    berrySound.play();
-    // Handle collision logic for Berry
+    this.playBerrySound();
     berry.handleCollision();
   }
 
-  handleCollision() {
-    this.lives--;
+  playBerrySound() {
+    const berrySound = document.getElementById("berrySound");
+    berrySound.play();
+  }
 
-    console.log("Lives:", this.lives);
+  handleCollision() {
+    this.playFalinksCrySound();
+    this.lives--;
     this.livesCounter.textContent = `Lives: ${this.lives}`;
 
     if (this.lives <= 0) {
@@ -355,6 +329,12 @@ class Game {
       this.playerReset();
     }
   }
+
+  playFalinksCrySound() {
+    const falinksCrySound = document.getElementById("falinksCrySound");
+    falinksCrySound.play();
+  }
+
   // HitBoxes
   getPlayerHitbox() {
     const playerRect = this.player.element.getBoundingClientRect();
@@ -366,7 +346,6 @@ class Game {
       const obstacleRect = obstacle.element.getBoundingClientRect();
       return this.adjustHitbox(obstacleRect);
     } else {
-      // Handle the case where obstacle is null (or not defined)
       return { left: 0, right: 0, top: 0, bottom: 0 };
     }
   }
@@ -399,62 +378,58 @@ class Game {
       bottom: rect.bottom - 13,
     };
   }
+  stopSoundAfterDelay(soundId, delay) {
+    setTimeout(() => {
+      const sound = document.getElementById(soundId);
+      sound.pause();
+      sound.currentTime = 0;
+    }, delay);
+  }
   // ResetGame
   resetGame() {
     this.isGameOver = true;
-    this.gameScreen.style.display = "none";
-    this.endScreen.style.display = "block";
-    // Additional actions as needed
-    const gameScreenAudio = document.getElementById("gameScreenAudio");
+    this.hideGameScreen();
+    this.showEndScreen();
+    this.pauseGameScreenAudio();
+  }
 
-    // Pause the game screen audio
+  hideGameScreen() {
+    this.gameScreen.style.display = "none";
+  }
+
+  showEndScreen() {
+    this.endScreen.style.display = "block";
+    this.resetGameState();
+  }
+
+  pauseGameScreenAudio() {
+    const gameScreenAudio = document.getElementById("gameScreenAudio");
     if (!gameScreenAudio.paused) {
       gameScreenAudio.pause();
     }
   }
 
-  playerReset() {
-    this.player.resetPosition();
-  }
-  // EndGame
-  endGame() {
-    this.isGameOver = true;
-    this.gameScreen.style.display = "none";
-    this.endScreen.style.display = "block";
-    this.isGameOver = true;
-    this.lives = 3; // Reset the number of lives
-    this.score = 0; // Reset the score
+  resetGameState() {
+    this.clearObstacles();
+    this.playerReset();
+    this.lives = 3;
+    this.score = 0;
     this.livesCounter.textContent = `Lives: ${this.lives}`;
     this.updateScoreDisplay();
-    this.clearObstacles();
     this.createObstacles(7);
     this.createLapras();
     this.createLotadObstacles(7);
     this.createFeraligatr(1);
     this.isGameOver = false;
     this.gameLoop();
-    // Reset game state
-    this.resetGameState();
-    // Music ends
-    const gameScreenAudio = document.getElementById("gameScreenAudio");
-
-    // Pause the game screen audio
-    if (!gameScreenAudio.paused) {
-      gameScreenAudio.pause();
-    }
-
-    console.log("Game Over");
-  }
-
-  resetGameState() {
-    this.player.resetPosition();
-    this.lives = 3;
-    this.clearObstacles();
-    this.isGameOver = false;
   }
 
   clearObstacles() {
     this.obstacles.forEach((obstacle) => obstacle.element.remove());
     this.obstacles = [];
+  }
+
+  playerReset() {
+    this.player.resetPosition();
   }
 }
