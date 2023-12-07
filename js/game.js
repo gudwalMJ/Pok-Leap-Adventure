@@ -69,10 +69,12 @@ class Game {
     this.createEasterEgg(1);
     this.createBerry();
     this.livesCounter.textContent = `Lives: ${this.lives}`;
-    this.gameLoop();
     this.muteButton.style.display = "block";
     this.playGameScreenAudio();
     this.muteButton.addEventListener("click", this.toggleGameScreenAudio);
+
+    // Start the game loop after setting up the initial state
+    this.gameLoop();
   }
 
   hideScreens() {
@@ -199,6 +201,7 @@ class Game {
       this.updateScoreDisplay();
       this.createEasterEgg();
       this.createBerry();
+      this.checkWin();
       this.animateId = requestAnimationFrame(this.gameLoop);
     }
   }
@@ -207,6 +210,30 @@ class Game {
     this.obstacles.forEach((obstacle) => obstacle.move());
     this.laprases.forEach((lapras) => lapras.move());
     this.lotads.forEach((lotad) => lotad.move());
+  }
+
+  // Method to check for a win
+  checkWin() {
+    if (this.score >= 4000) {
+      this.handleWin();
+    }
+  }
+
+  // If won
+  handleWin() {
+    this.isGameOver = true;
+    this.displayWinMessage();
+    this.displayFinalScore();
+    this.hideGameScreen();
+    this.showEndScreen();
+    this.pauseGameScreenAudio();
+  }
+  // "You Won!" message
+  displayWinMessage() {
+    const finalScoreElement = document.getElementById("endGame");
+    if (finalScoreElement) {
+      finalScoreElement.textContent = "Congratulations You Won!";
+    }
   }
 
   // Score Display
@@ -269,8 +296,10 @@ class Game {
 
   // Feraligatr Collision
   handleFeraligatrCollision() {
+    console.log("Feraligatr Collision!");
     this.playFeraligatrCollisionSound();
     this.score += 150;
+    console.log("Current Score:", this.score);
     this.updateScoreDisplay();
     this.playerReset();
     this.stopSoundAfterDelay("feraligatrCollisionSound", 2000);
@@ -287,7 +316,7 @@ class Game {
   handleEasterEggCollision(easterEgg) {
     this.stopEasterEggSound();
     this.playFeraligatrCollisionSound();
-    this.score += 1500;
+    this.score += 2000;
     this.updateScoreDisplay();
     this.removeEasterEgg(easterEgg);
     this.stopSoundAfterDelay("feraligatrCollisionSound", 2000);
@@ -388,9 +417,17 @@ class Game {
   // ResetGame
   resetGame() {
     this.isGameOver = true;
+    this.pauseGameScreenAudio();
+    this.displayFinalScore();
     this.hideGameScreen();
     this.showEndScreen();
-    this.pauseGameScreenAudio();
+  }
+  // Display final score
+  displayFinalScore() {
+    const finalScoreElement = document.getElementById("final-score");
+    if (finalScoreElement) {
+      finalScoreElement.textContent = `Final Score: ${this.score}`;
+    }
   }
 
   hideGameScreen() {
@@ -416,12 +453,14 @@ class Game {
     this.score = 0;
     this.livesCounter.textContent = `Lives: ${this.lives}`;
     this.updateScoreDisplay();
-    this.createObstacles(7);
-    this.createLapras();
-    this.createLotadObstacles(7);
-    this.createFeraligatr(1);
     this.isGameOver = false;
-    this.gameLoop();
+  }
+
+  clearFinalScoreElement() {
+    const finalScoreElement = document.getElementById("final-score");
+    if (finalScoreElement) {
+      finalScoreElement.textContent = `Final Score: ${this.score}`;
+    }
   }
 
   clearObstacles() {
