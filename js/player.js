@@ -11,6 +11,18 @@ class Player {
     this.directionY = 0;
     this.prevTime = performance.now();
     this.resetCounter = 0;
+    // Sound for player
+    this.playerSpawnSound = document.getElementById("playerSpawnSound");
+    this.playerSpawnSound.load();
+    this.playPlayerSpawnSound();
+    // Sound for Player Croconaw
+    this.croconawSound = document.getElementById("croconawSound");
+    this.croconawSound.load();
+    this.croconawSoundPlayed = false;
+    // Sound for Player Feraligatr
+    this.feraligatrSound = document.getElementById("feraligatrSound");
+    this.feraligatrSound.load();
+    this.feraligatrSoundPlayed = false;
 
     this.element = document.createElement("img");
     this.element.src = "images/totodile.png";
@@ -33,6 +45,22 @@ class Player {
     this.resetPosition();
     // Start the animation loop
     this.animate();
+  }
+  // Sound for player
+  playPlayerSpawnSound() {
+    if (this.playerSpawnSound) {
+      this.playerSpawnSound.play();
+    }
+  }
+  playCroconawSound() {
+    if (this.croconawSound) {
+      this.croconawSound.play();
+    }
+  }
+  playFeraligatrSound() {
+    if (this.feraligatrSound) {
+      this.feraligatrSound.play();
+    }
   }
 
   getPlayerHitbox() {
@@ -123,12 +151,20 @@ class Player {
       this.element.style.width = "50px";
       this.element.style.height = "60px";
       this.MOVE_SPEED = 1.6;
+      if (!this.croconawSoundPlayed) {
+        this.playCroconawSound();
+        this.croconawSoundPlayed = true;
+      }
     } else if (this.resetCounter >= 12) {
       // Change sprite to the final evolution (Feraligatr)
       this.element.src = "images/feraligatr2.png";
       this.element.style.width = "70px";
       this.element.style.height = "80px";
       this.MOVE_SPEED = 1.7;
+      if (!this.feraligatrSoundPlayed) {
+        this.playFeraligatrSound();
+        this.feraligatrSoundPlayed = true;
+      }
     } else {
       // Default sprite (Totodile)
       this.element.src = "images/totodile.png";

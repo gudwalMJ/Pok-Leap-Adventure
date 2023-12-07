@@ -3,13 +3,19 @@ class Game {
     this.startScreen = document.getElementById("game-intro");
     this.gameScreen = document.getElementById("game-screen");
     this.endScreen = document.getElementById("game-end");
+    this.gameScreenAudio = document.getElementById("gameScreenAudio");
     this.height = 750;
     this.width = 900;
     this.player = null;
+    // Volume
+    this.gameScreenAudio.volume = 0.3;
+
+    // Obstacles
     this.obstacles = [];
     this.laprases = [];
     this.lotads = [];
     this.feraligatr = [];
+    // Items
     this.easterEggs = [];
     this.berry = null;
     this.lastBerryCreationScore = 0;
@@ -18,6 +24,8 @@ class Game {
     this.lives = 3;
     this.livesCounter = document.getElementById("lives-counter");
     this.isGameOver = false;
+    // Mute button
+    this.muteButton = document.getElementById("muteButton");
 
     // Constants
     this.obstacleMargins = [0.12, 0.24, 0.18];
@@ -25,20 +33,46 @@ class Game {
 
     // Bind methods to the instance
     this.gameLoop = this.gameLoop.bind(this);
+    // mute button binded
+    this.toggleGameScreenAudio = this.toggleGameScreenAudio.bind(this);
+  }
+  // Sound
+  playGameScreenAudio() {
+    const gameScreenAudio = document.getElementById("gameScreenAudio");
+    if (gameScreenAudio.paused) {
+      gameScreenAudio.play();
+    } else {
+      gameScreenAudio.pause();
+    }
+  }
+  toggleGameScreenAudio() {
+    const gameScreenAudio = document.getElementById("gameScreenAudio");
+    if (gameScreenAudio.paused) {
+      gameScreenAudio.play();
+    } else {
+      gameScreenAudio.pause();
+    }
   }
 
   start() {
     this.hideScreens();
     this.setGameScreenSize();
+    // Player
     this.createPlayer();
+
+    // Obstacles
     this.createObstacles(7);
     this.createLapras();
     this.createLotadObstacles(7);
     this.createFeraligatr(1);
+    // Items
     this.createEasterEgg(1);
     this.createBerry();
     this.livesCounter.textContent = `Lives: ${this.lives}`;
     this.gameLoop();
+    this.muteButton.style.display = "block";
+    this.playGameScreenAudio(); // Start the game audio
+    this.muteButton.addEventListener("click", this.toggleGameScreenAudio);
   }
 
   hideScreens() {
@@ -74,6 +108,10 @@ class Game {
   createEasterEgg() {
     // Check if the score is greater than or equal to 1000 to spawn Easter Egg
     if (this.score >= 1000 && !this.easterEggAppeared) {
+      // Play the Easter Egg sound
+      const easterEggSound = document.getElementById("easterEggSound");
+      easterEggSound.play();
+
       const easterEgg = new EasterEgg(this.gameScreen);
       easterEgg.spawn();
       this.easterEggs.push(easterEgg);
@@ -135,6 +173,7 @@ class Game {
     return array;
   }
 
+  // Create Lotad
   createLotadObstacles(numObstacles) {
     this.lotads = [];
 
@@ -147,7 +186,7 @@ class Game {
     const lotad = new ObstacleLotad(this.gameScreen);
     this.lotads.push(lotad);
   }
-
+  // Create Falinks
   createObstacles(numObstacles) {
     this.obstacles = [];
 
@@ -175,7 +214,7 @@ class Game {
     }
     return array;
   }
-
+  // GameLoop
   gameLoop() {
     if (!this.isGameOver) {
       this.player.move();
@@ -195,6 +234,15 @@ class Game {
     this.lotads.forEach((lotad) => lotad.move());
   }
 
+  // Score Display
+  updateScoreDisplay() {
+    // Update the score display element (assuming you have an element with id 'score-counter')
+    const scoreCounter = document.getElementById("score-counter");
+    if (scoreCounter) {
+      scoreCounter.textContent = `Score: ${this.score}`;
+    }
+  }
+  // Collisions
   checkCollisions() {
     this.checkCollisionGroup(this.obstacles);
     this.checkCollisionGroup(this.laprases);
@@ -243,26 +291,36 @@ class Game {
       rect1.bottom > rect2.top
     );
   }
-
-  updateScoreDisplay() {
-    // Update the score display element (assuming you have an element with id 'score-counter')
-    const scoreCounter = document.getElementById("score-counter");
-    if (scoreCounter) {
-      scoreCounter.textContent = `Score: ${this.score}`;
-    }
-  }
-
+  // Feraligatr Collision
   handleFeraligatrCollision() {
+    // Play the Feraligatr collision sound
+    const feraligatrCollisionSound = document.getElementById(
+      "feraligatrCollisionSound"
+    );
+    feraligatrCollisionSound.play();
+
     // Increase the score
     this.score += 150; // You can adjust the score increment as needed
 
     // Update the score display
     this.updateScoreDisplay();
 
+    // Reset the player's position
     this.playerReset();
-  }
 
+    // Stop the Feraligatr collision sound after 2 seconds
+    setTimeout(() => {
+      feraligatrCollisionSound.pause();
+      feraligatrCollisionSound.currentTime = 0;
+    }, 2000);
+  }
+  // Easter Egg collision
   handleEasterEggCollision(easterEgg) {
+    // Stop the Easter Egg sound
+    const easterEggSound = document.getElementById("easterEggSound");
+    easterEggSound.pause();
+    easterEggSound.currentTime = 0;
+
     // Increase the score by 1000
     this.score += 1500;
 
@@ -276,12 +334,28 @@ class Game {
       easterEgg.element.remove();
     }
   }
-
+  // Berry Collision
   handleBerryCollision(berry) {
+    // Play berry sound
+    const berrySound = document.getElementById("berrySound");
+    berrySound.play();
     // Handle collision logic for Berry
     berry.handleCollision();
   }
 
+  handleCollision() {
+    this.lives--;
+
+    console.log("Lives:", this.lives);
+    this.livesCounter.textContent = `Lives: ${this.lives}`;
+
+    if (this.lives <= 0) {
+      this.resetGame();
+    } else {
+      this.playerReset();
+    }
+  }
+  // HitBoxes
   getPlayerHitbox() {
     const playerRect = this.player.element.getBoundingClientRect();
     return this.adjustHitbox(playerRect);
@@ -325,31 +399,24 @@ class Game {
       bottom: rect.bottom - 13,
     };
   }
-
-  handleCollision() {
-    this.lives--;
-
-    console.log("Lives:", this.lives);
-    this.livesCounter.textContent = `Lives: ${this.lives}`;
-
-    if (this.lives <= 0) {
-      this.resetGame();
-    } else {
-      this.playerReset();
-    }
-  }
-
+  // ResetGame
   resetGame() {
     this.isGameOver = true;
     this.gameScreen.style.display = "none";
     this.endScreen.style.display = "block";
     // Additional actions as needed
+    const gameScreenAudio = document.getElementById("gameScreenAudio");
+
+    // Pause the game screen audio
+    if (!gameScreenAudio.paused) {
+      gameScreenAudio.pause();
+    }
   }
 
   playerReset() {
     this.player.resetPosition();
   }
-
+  // EndGame
   endGame() {
     this.isGameOver = true;
     this.gameScreen.style.display = "none";
@@ -368,6 +435,13 @@ class Game {
     this.gameLoop();
     // Reset game state
     this.resetGameState();
+    // Music ends
+    const gameScreenAudio = document.getElementById("gameScreenAudio");
+
+    // Pause the game screen audio
+    if (!gameScreenAudio.paused) {
+      gameScreenAudio.pause();
+    }
 
     console.log("Game Over");
   }

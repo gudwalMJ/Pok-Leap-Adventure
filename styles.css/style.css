@@ -166,6 +166,18 @@ body {
   margin-bottom: 20px;
 }
 
+#muteButton {
+  font-size: 20px;
+  background-color: #3c5aa6;
+  color: #ffcb05;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  margin-top: 10px;
+  cursor: pointer;
+  display: none; /* Initially hide the button */
+}
+
 #game-screen {
   align-content: center;
   padding: 20px 0px;
