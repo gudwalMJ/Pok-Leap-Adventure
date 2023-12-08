@@ -10,7 +10,7 @@ class Game {
 
     // Game properties
     this.height = 750;
-    this.width = 900;
+    this.width = 800;
     this.player = null;
     this.obstacles = [];
     this.laprases = [];
